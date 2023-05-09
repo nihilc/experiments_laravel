@@ -1,66 +1,206 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# **API-TOKEN**
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este experimento fue realizado para aprender a crear un API usando Laravel Sanctum para la autenticación.
 
-## About Laravel
+Fue hecho siguiendo el tutorial [API en Laravel 10 | Autenticación Sanctum](https://www.youtube.com/watch?v=fsiPXKzcH2M)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## **Configuración de entorno**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+en mi caso utilice un vhost configurado en mis Hosts y Apache con la dirección **_api-token.test_** redirigiendo a la carpeta **_public_** del proyecto
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## **Modelos y relaciones**
 
-## Learning Laravel
+### User
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Se utiliza para guardar la información de los usuarios de la aplicación es el por defecto que nos ofrece Laravel
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Department
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Se encarga de manejar la information de los departamentos realizando **CRUD** en la base de datos.Tiene una relación **1-n** con el modelo `Employee` esto se especifica en el siguiente método
 
-## Laravel Sponsors
+```php
+public function employees()
+{
+    return $this->hasMany(Employee::class);
+}
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Aparte de ello se esta manejando softDelete para lo cual se agrego en la migración dicho campo
 
-### Premium Partners
+```php
+$table->softDeletes();
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Y en el Modelo se indica que se debe manejar con softDelete usando la declaración:
 
-## Contributing
+```php
+class Employee extends Model
+{
+    use SoftDeletes;
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+También se están guardando registros de creación y actualización. Por ello para enviar la información limpia en la API utilizamos el atributo `$hidden` del Modelo para especificar los campos que no serán enviados en las respuestas
 
-## Code of Conduct
+```php
+protected $hidden = [
+    "created_at",
+    "updated_at",
+    "deleted_at"
+];
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Employee
 
-## Security Vulnerabilities
+Se encarga de manejar la information de los empleados realizando **CRUD** en la base de datos.Tiene una relación **n-1** con el modelo `Department` esto se especifica en el siguiente método
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```php
+public function department()
+{
+    return $this->belongsTo(Department::class);
+}
+```
 
-## License
+Al igual que el Modelo `Department` en este se esta utilizando softDelete y timeStamps por lo que se hace el mismo proceso que en el modelo `Department` para ocultar dichos campos en las respuestas
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## **Routes**
+
+Los modelos `Department` y `Employee` se están manejando como Recursos por lo cual se definen con `Route::resource()`. Estas rutas están protegidas por autenticación por lo cual no se puede acceder a ellas sin una sesión de usuario.
+
+Aparte de ello se definieron las siguientes rutas para la creación, login y logout de usuarios
+
+|   Verb   | Route               | Controller       | Action     |
+| :------: | ------------------- | ---------------- | ---------- |
+| **post** | "api/auth/register" | `AuthController` | _create()_ |
+| **post** | "api/auth/login"    | `AuthController` | _login()_  |
+| **get**  | "api/auth/logout"   | `AuthController` | _logout()_ |
+
+de igual manera se puede utilizar el comando de artisan `route:list` para consultar todas las rutas definidas en la aplicación
+
+## **Requests and Responses**
+
+### **Registro de usuario**
+
+Request:
+
+-   Route: "api/auth/register"
+-   Header: Accept application/json
+-   Auth: None
+-   Body:
+
+```json
+{
+    "name": "Some Name",
+    "email": "example@example.com",
+    "password": "12345abcde"
+}
+```
+
+Response:
+
+```json
+{
+    "status": true,
+    "message": "User created successfully",
+    "token": "5|PrL5GaDvl2Pc3KRjmtsMFZtSfYlQAMrm8wr5jRsP"
+}
+```
+
+### **Login**
+
+Request:
+
+-   Route: "api/auth/login"
+-   Header: Accept application/json
+-   Auth: None
+-   Body:
+
+```json
+{
+    "email": "example@example.com",
+    "password": "12345abdce"
+}
+```
+
+Response:
+
+```json
+{
+    "status": true,
+    "message": "User logged in successfully",
+    "data": {
+        "id": 2,
+        "name": "Some Name",
+        "email": "example@example.com",
+        "email_verified_at": null
+    },
+    "token": "6|z2KHghmvCBcUmzXhwJlZFQ46DMQ1e2PjK90Ho6Jk"
+}
+```
+
+### **Logout**
+
+Description: Unset all tokens of the user
+
+Request:
+
+-   Route: "api/auth/logout"
+-   Header: Accept application/json
+-   Auth: Token
+-   Body; None
+
+Response:
+
+```json
+{
+    "status": true,
+    "message": "User logged out successfully"
+}
+```
+
+### List Departments
+
+Description: Give you all departments in database
+
+Request:
+
+-   Route: "api/departments"
+-   Header: Accept application/json
+-   Auth: Token
+-   Body; None
+
+Response:
+
+```json
+{
+    "status": true,
+    "data": [
+        {
+            "id": 1,
+            "name": "Construction Driller"
+        },
+        {
+            "id": 2,
+            "name": "Freight and Material Mover"
+        }
+        // other departments...
+    ]
+}
+```
+
+### Template
+
+Description:
+
+Request:
+
+-   Route: "api/"
+-   Header: Accept application/json
+-   Auth: Token
+-   Body; None
+
+Response:
+
+```json
+{}
+```
