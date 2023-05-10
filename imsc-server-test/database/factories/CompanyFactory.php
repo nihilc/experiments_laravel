@@ -17,7 +17,12 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "name" => $this->faker->company,
+            "acronym" => $this->faker->unique()->regexify("[A-Z]{3}"),
+            "logo" => $this->faker->imageUrl(200, 200),
+            "created_at" => $this->faker->dateTimeBetween("-1 years", "now"),
+            "updated_at" => $this->faker->dateTimeBetween("-1 years", "now"),
+            "deleted_at" => null,
         ];
     }
 }
