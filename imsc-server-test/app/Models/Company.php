@@ -13,4 +13,9 @@ class Company extends Model
     protected $fillable = ["name", "acronym", "logo"];
     // protected $hidden = ["created_at", "updated_at", "deleted_at"];
     protected $dates = ["created_at", "updated_at", "deleted_at"];
+
+    public function workers()
+    {
+        return $this->hasMany(Worker::class);
+    }
 }
