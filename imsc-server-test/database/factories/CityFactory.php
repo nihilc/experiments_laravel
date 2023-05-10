@@ -17,7 +17,10 @@ class CityFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "name" => $this->faker->city,
+            "created_at" => $this->faker->dateTimeBetween("-1 years", "now"),
+            "updated_at" => $this->faker->dateTimeBetween("-1 years", "now"),
+            "deleted_at" => null,
         ];
     }
 }
