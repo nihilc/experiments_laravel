@@ -10,7 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table("users", function (Blueprint $table) {});
+        Schema::table("users", function (Blueprint $table) {
+            $table
+                ->foreignId("worker_id")
+                ->unique()
+                ->constrained("workers")
+                ->onDelete("cascade")
+                ->onUpdate("cascade");
+        });
     }
 
     /**
