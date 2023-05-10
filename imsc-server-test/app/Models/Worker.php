@@ -33,4 +33,9 @@ class Worker extends Model
     {
         return $this->belongsTo(City::class);
     }
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
 }
