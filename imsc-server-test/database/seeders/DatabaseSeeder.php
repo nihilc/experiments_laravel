@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 use App\Models\Company;
 use App\Models\City;
@@ -28,5 +29,6 @@ class DatabaseSeeder extends Seeder
             ->each(function ($user) {
                 $user->roles()->attach(Role::inRandomOrder()->first());
             });
+        Category::factory(10)->create();
     }
 }
