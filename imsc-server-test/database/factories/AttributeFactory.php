@@ -17,7 +17,20 @@ class AttributeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "name" => $this->faker->randomElement([
+                "mark",
+                "model",
+                "serial",
+                "imei",
+                "storage",
+                "storage type",
+                "ram",
+                "ram type",
+                "cpu",
+                "size",
+                "color",
+                "description",
+            ]),
         ];
     }
 }
