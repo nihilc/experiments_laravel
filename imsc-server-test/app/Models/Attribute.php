@@ -20,4 +20,8 @@ class Attribute extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    public function items()
+    {
+        return $this->belongsToMany(Items::class);
+    }
 }

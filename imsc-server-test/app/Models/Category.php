@@ -18,4 +18,9 @@ class Category extends Model
     {
         return $this->hasMany(Attribute::class);
     }
+
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
 }
