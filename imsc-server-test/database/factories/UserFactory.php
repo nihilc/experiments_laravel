@@ -21,7 +21,7 @@ class UserFactory extends Factory
             "username" => $this->faker->userName(),
             "password" =>
                 '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            "worker_id" => $this->faker->numberBetween(1, 30),
+            "worker_id" => $this->faker->unique()->numberBetween(1, 30),
             "remember_token" => Str::random(10),
             "created_at" => $this->faker->dateTimeBetween("-1 years", "now"),
             "updated_at" => $this->faker->dateTimeBetween("-1 years", "now"),
