@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
+use App\Models\City;
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +20,16 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "cod" => $this->faker->unique()->numberBetween(1, 500),
+            "state" => $this->faker->randomElement([
+                "Active",
+                "Inactive",
+                "Deprecated",
+            ]),
+            "image" => $this->faker->imageUrl(300, 300),
+            "company_id" => Company::factory(),
+            "city_id" => City::factory(),
+            "category_id" => Category::factory(),
         ];
     }
 }
