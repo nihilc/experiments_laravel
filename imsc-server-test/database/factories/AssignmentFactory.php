@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
+use App\Models\Worker;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,11 @@ class AssignmentFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "type" => $this->faker->numberBetween(1, 6),
+            "date" => $this->faker->dateTimeBetween("-1 years", "now"),
+            "note" => $this->faker->sentence(),
+            "user_id" => User::factory(),
+            "worker_id" => Worker::factory(),
         ];
     }
 }

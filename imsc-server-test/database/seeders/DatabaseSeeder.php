@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Assignment;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Item;
@@ -39,16 +40,20 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         Item::factory(10)
-
             ->recycle(Category::all())
             ->recycle(City::all())
             ->recycle(Company::all())
-            ->hasAttached(
-                Attribute::factory()
-                    ->count(2)
-                    ->for(Category::factory()->count(10)),
-                ["value" => fake()->word()]
-            )
+            ->hasAttached(Attribute::all(), ["value" => fake()->word()])
+            ->create();
+
+        Assignment::factory(10)
+            ->recycle(User::all())
+            ->recycle(Worker::all())
+            ->hasAttached(Item::all(), [
+                "assign_note" => fake()->sentence(),
+                "return_note" => fake()->sentence(),
+                "return_date" => now(),
+            ])
             ->create();
     }
 }
