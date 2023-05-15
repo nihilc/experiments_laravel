@@ -13,8 +13,8 @@ return new class extends Migration {
         Schema::create("assignment_item", function (Blueprint $table) {
             $table->id();
             $table->text("assign_note");
-            $table->text("return_note");
-            $table->date("return_date");
+            $table->text("return_note")->nullable();
+            $table->date("return_date")->nullable();
             $table
                 ->foreignId("assignment_id")
                 ->constrained("assignments")

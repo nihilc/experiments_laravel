@@ -21,15 +21,17 @@ return new class extends Migration {
                 "Removal",
             ]);
             $table->date("date");
-            $table->note("note");
+            $table->text("note");
 
             $table
                 ->foreignId("worker_id")
+                ->nullable()
                 ->constrained("workers")
                 ->onDelete("set null")
                 ->onUpdate("cascade");
             $table
                 ->foreignId("user_id")
+                ->nullable()
                 ->constrained("users")
                 ->onDelete("set null")
                 ->onUpdate("cascade");
