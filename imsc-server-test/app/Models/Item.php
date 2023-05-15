@@ -28,8 +28,18 @@ class Item extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
     public function attributes()
     {
         return $this->belongsToMany(Attribute::class)->withPivot("value");
+    }
+
+    public function assignments()
+    {
+        return $this->belongsToMany(Assignment::class)->withPivot([
+            "assign_note",
+            "return_note",
+            "return_date",
+        ]);
     }
 }
